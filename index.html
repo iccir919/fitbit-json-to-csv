@@ -3,6 +3,24 @@
   <head>
     <title>Fitbit Data JSON to .csv File</title>
 
+    <style>
+      body {
+        font: 14px "Arial", sans-serif;
+        text-align: center;
+      }
+
+      header {
+        background-color: steelblue;
+        color: whitesmoke;
+        padding: 10px;
+      }
+    </style>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-105987818-6"
+    ></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script
       async
@@ -17,31 +35,21 @@
 
       gtag("config", "UA-105987818-6");
     </script>
-
-    <style>
-      #drop_zone {
-        text-align: center;
-        border: 5px solid turquoise;
-        width: 500px;
-        height: 250px;
-      }
-      body {
-        font: 14px "Arial", sans-serif;
-        text-align: center;
-        margin-top: 50px;
-      }
-    </style>
   </head>
   <body>
+    <header>
+      <h1>Fitbit Data JSON to .csv File Converter</h1>
+      <h3>Easy as 1, 2, 3!</h3>
+    </header>
     <div class="container">
-      <h1>Fitbit Data JSON to .csv File</h1>
-      <h2>Step 1: Choose your timezone</h2>
+      <h2><strong>1</strong>: Choose your timezone</h2>
       <select id="timezoneSelector">
         <option disabled selected value> -- Select An Option -- </option>
       </select>
-      <h2>Step 2: Select your file(s)</h2>
+      <h2><strong>2</strong>: Select your file(s)</h2>
       <input type="file" id="files" name="files[]" multiple />
       <output id="list"></output>
+      <h2><strong>3</strong>: Download</h2>
     </div>
     <script src="./moment.js"></script>
     <script src="./moment-timezones.js"></script>
