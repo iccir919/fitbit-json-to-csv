@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Fitbit Data JSON to .csv File</title>
+    <style>
+      #drop_zone {
+        text-align: center;
+        border: 5px solid turquoise;
+        width: 500px;
+        height: 250px;
+      }
+      body {
+        font: 14px "Arial", sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Fitbit Data JSON to .csv File</h1>
+      <h2>Step 1: Choose your timezone</h2>
+      <select id="timezoneSelector">
+        <option disabled selected value> -- Select An Option -- </option>
+      </select>
+      <h2>Step 2: Select your file(s)</h2>
+      <input type="file" id="files" name="files[]" multiple />
+      <output id="list"></output>
+    </div>
+    <script src="./moment.js"></script>
+    <script src="./moment-timezones.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/json2csv"></script>
+    <script>
+      var select = document.getElementById("timezoneSelector"),
+        timezones = moment.tz.names();
+
+      for (var i = 0; i <= timezones.length; i++) {
+        var opt = document.createElement("option");
+        opt.value = timezones[i];
+        opt.innerHTML = timezones[i];
+        select.appendChild(opt);
+      }
+
+      function handleFileSelect(evt) {
+        var files = evt.target.files; // FileList object
+
+        // Loop through the FileList and render image files as thumbnails.
+        for (var i = 0, f; (f = files[i]); i++) {
+          // Only process json files.
+          if (!f.type.match("application/json")) {
+            continue;
+          }
+          var reader = new FileReader();
+          var fileName = f.name;
+          // Closure to capture the file information.
+          reader.onload = (function(theFile) {
+            return function(e) {
+              var contents = e.target.result;
+              handleData(contents, fileName);
+            };
+          })(f);
+
+          // Read in the image file as a data URL.
+          reader.readAsText(f);
+        }
+      }
+
+      function handleData(contents, fileName) {
+        var timezoneSelector = document.getElementById("timezoneSelector");
+        var timezoneSelection =
+          timezoneSelector.options[timezoneSelector.selectedIndex].text;
+
+        contents = JSON.parse(contents);
+
+        if (timezoneSelection !== "-- Select An Option --") {
+          for (var i = 0; i < contents.length; i++) {
+            if (!contents[i].dateTime) {
+              break;
+            }
+
+            var london = moment.tz(
+              contents[i].dateTime,
+              "MM-DD-YYYY HH:mm:ss",
+              "Europe/London"
+            );
+
+            var desiredTimezone = london.clone().tz(timezoneSelection);
+            contents[i].dateTime = desiredTimezone.format(
+              "MM-DD-YYYY HH:mm:ss"
+            );
+          }
+        }
+        var csv = json2csv.parse(contents, { flatten: true });
+        var uri = "data:text/csv;charset=utf-8," + encodeURI(csv);
+
+        // Now the little tricky part.
+        // you can use either>> window.open(uri);
+        // but this will not work in some browsers
+        // or you will not get the correct file extension
+
+        //this trick will generate a temp <a /> tag
+        var link = document.createElement("a");
+        link.href = uri;
+
+        //set the visibility hidden so it will not effect on your web-layout
+        link.style = "visibility:hidden";
+        fileName = fileName.replace(".json", "");
+        link.download = fileName + ".csv";
+
+        //this part will append the anchor tag and remove it after automatic click
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      document
+        .getElementById("files")
+        .addEventListener("change", handleFileSelect, false);
+    </script>
+  </body>
+</html>
