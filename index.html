@@ -42,14 +42,20 @@
       <h3>Easy as 1, 2, 3!</h3>
     </header>
     <div class="container">
-      <h2><strong>1</strong>: Choose your timezone</h2>
+      <h2>
+        <strong>1</strong>: Choose your timezone to convert data timestamp from
+        GMT
+      </h2>
       <select id="timezoneSelector">
         <option disabled selected value> -- Select An Option -- </option>
       </select>
-      <h2><strong>2</strong>: Select your file(s)</h2>
+      <h2>
+        <strong>2</strong>: Select the Fitbit JSON data file(s) you want in .csv
+        format
+      </h2>
       <input type="file" id="files" name="files[]" multiple />
       <output id="list"></output>
-      <h2><strong>3</strong>: Download</h2>
+      <h2><strong>3</strong>: File(s) will automatically download</h2>
     </div>
     <script src="./moment.js"></script>
     <script src="./moment-timezones.js"></script>
