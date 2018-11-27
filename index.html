@@ -53,12 +53,13 @@
         <strong>2</strong>: Select the Fitbit JSON data file(s) you want in .csv
         format
       </h2>
+      <input type="checkbox" id="mergeFiles" name="merge" value="merge" />
+      Merge/join files into one
+      <input type="file" id="files" name="files[]" multiple />
       <p>
         When the file selection appears, hold down "Shift" to select more than
         one file!
       </p>
-      <input type="file" id="files" name="files[]" multiple />
-      <output id="list"></output>
       <h2><strong>3</strong>: File(s) will automatically download</h2>
     </div>
     <script src="./moment.js"></script>
@@ -78,33 +79,60 @@
       function handleFileSelect(evt) {
         var files = evt.target.files; // FileList object
 
-        // Loop through the FileList and render image files as thumbnails.
-        for (var i = 0, f; (f = files[i]); i++) {
-          // Only process json files.
-          if (!f.type.match("application/json")) {
-            continue;
-          }
-          var reader = new FileReader();
-          var fileName = f.name;
-          // Closure to capture the file information.
-          reader.onload = (function(theFile) {
-            return function(e) {
-              var contents = e.target.result;
-              handleData(contents, fileName);
-            };
-          })(f);
+        var merge = document.getElementById("mergeFiles").checked;
 
-          // Read in the image file as a data URL.
-          reader.readAsText(f);
+        if (merge) {
+          mergeFiles(files, handleData);
+        } else {
+          // Loop through the FileList and render image files as thumbnails.
+          for (var i = 0, f; (f = files[i]); i++) {
+            // Only process json files.
+            if (!f.type.match("application/json")) {
+              continue;
+            }
+            var reader = new FileReader();
+            var fileName = f.name;
+            // Closure to capture the file information.
+            reader.onload = (function(theFile) {
+              return function(e) {
+                var contents = e.target.result;
+                handleData(contents, fileName);
+              };
+            })(f);
+
+            // Read in the image file as text.
+            reader.readAsText(f);
+          }
+        }
+      }
+
+      function mergeFiles(files, callback) {
+        var count = files.length - 1;
+        var mergedFile = [];
+
+        for (var i = 0; i < count; i++) {
+          mergeFile(files[i]);
+        }
+
+        function mergeFile(file) {
+          var reader = new FileReader();
+          console.log(file);
+          reader.onload = function(event) {
+            var contents = JSON.parse(this.result);
+            console.log(Array.isArray(contents));
+            mergedFile = mergedFile.concat(contents);
+            if (!--count) callback(mergedFile);
+          };
+          reader.readAsText(file);
         }
       }
 
       function handleData(contents, fileName) {
+        fileName = fileName || "Fitbit-Export";
+        if (contents.length === 0) return;
         var timezoneSelector = document.getElementById("timezoneSelector");
         var timezoneSelection =
           timezoneSelector.options[timezoneSelector.selectedIndex].text;
-
-        contents = JSON.parse(contents);
 
         if (timezoneSelection !== "-- Select An Option --") {
           for (var i = 0; i < contents.length; i++) {
