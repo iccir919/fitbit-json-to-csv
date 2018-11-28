@@ -107,23 +107,43 @@
         }
       }
 
+      function resetFile() {
+        const file = document.getElementById("files");
+        file.value = "";
+      }
+
+      function isSameDataType(files) {
+        var dataType = files[0].name.split("-")[0];
+        for (var i = 1; i < files.length; i++) {
+          var test = files[i].name.split("-")[0];
+          if (test !== dataType) {
+            return false;
+          }
+        }
+        return true;
+      }
+
       function mergeFiles(files, callback) {
         var count = files.length - 1;
         var mergedFile = [];
 
-        for (var i = 0; i < count; i++) {
-          mergeFile(files[i]);
+        if (!isSameDataType(files)) {
+          alert("Sorry, when merging all files must be of same data type!");
+        } else {
+          for (var i = 0; i < count; i++) {
+            mergeFile(files[i]);
+          }
         }
+      }
 
-        function mergeFile(file) {
-          var reader = new FileReader();
-          reader.onload = function(event) {
-            var contents = JSON.parse(this.result);
-            mergedFile = mergedFile.concat(contents);
-            if (!--count) callback(mergedFile);
-          };
-          reader.readAsText(file);
-        }
+      function mergeFile(file) {
+        var reader = new FileReader();
+        reader.onload = function(event) {
+          var contents = JSON.parse(this.result);
+          mergedFile = mergedFile.concat(contents);
+          if (!--count) callback(mergedFile);
+        };
+        reader.readAsText(file);
       }
 
       function handleData(contents, fileName) {
