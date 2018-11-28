@@ -96,6 +96,7 @@
             reader.onload = (function(theFile) {
               return function(e) {
                 var contents = e.target.result;
+                contents = JSON.parse(contents);
                 handleData(contents, fileName);
               };
             })(f);
@@ -116,10 +117,8 @@
 
         function mergeFile(file) {
           var reader = new FileReader();
-          console.log(file);
           reader.onload = function(event) {
             var contents = JSON.parse(this.result);
-            console.log(Array.isArray(contents));
             mergedFile = mergedFile.concat(contents);
             if (!--count) callback(mergedFile);
           };
@@ -128,6 +127,7 @@
       }
 
       function handleData(contents, fileName) {
+        console.log(contents);
         fileName = fileName || "Fitbit-Export";
         if (contents.length === 0) return;
         var timezoneSelector = document.getElementById("timezoneSelector");
@@ -152,7 +152,11 @@
             );
           }
         }
-        var csv = json2csv.parse(contents, { flatten: true });
+
+        var csv = json2csv.parse(contents, {
+          flatten: true,
+          includeEmptyRows: true
+        });
         var uri = "data:text/csv;charset=utf-8," + encodeURI(csv);
 
         // Now the little tricky part.
