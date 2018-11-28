@@ -134,20 +134,19 @@
             mergeFile(files[i]);
           }
         }
-      }
 
-      function mergeFile(file) {
-        var reader = new FileReader();
-        reader.onload = function(event) {
-          var contents = JSON.parse(this.result);
-          mergedFile = mergedFile.concat(contents);
-          if (!--count) callback(mergedFile);
-        };
-        reader.readAsText(file);
+        function mergeFile(file) {
+          var reader = new FileReader();
+          reader.onload = function(event) {
+            var contents = JSON.parse(this.result);
+            mergedFile = mergedFile.concat(contents);
+            if (!--count) callback(mergedFile);
+          };
+          reader.readAsText(file);
+        }
       }
 
       function handleData(contents, fileName) {
-        console.log(contents);
         fileName = fileName || "Fitbit-Export";
         if (contents.length === 0) return;
         var timezoneSelector = document.getElementById("timezoneSelector");
